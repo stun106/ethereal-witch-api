@@ -18,5 +18,6 @@ public interface ICartShoppingRepository extends JpaRepository<CartShopping, Lon
             "WHERE u.id = :userId")
     List<Object[]> findCartShoppingInfoByUsername(@Param("userId") Long UserId);
 
+
 }
 

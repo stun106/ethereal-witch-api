@@ -11,12 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -41,5 +39,10 @@ public class ProductController {
         this.productRepository.save(productEntity);
         flashmsg.put("msg", productEntity.getNomeproduct() + " cadastrado com sucesso");
         return ResponseEntity.status(HttpStatus.CREATED).body(flashmsg);
+    }
+    @GetMapping("/collection/")
+    public ResponseEntity<List<Object[]>> findProductCat(@RequestParam("nome") String ncat){
+        var product = this.productRepository.findProductCategory(ncat);
+        return ResponseEntity.status(HttpStatus.OK).body(product);
     }
 }
