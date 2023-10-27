@@ -42,4 +42,14 @@ public class UserController {
         var allUser = this.iuserRepository.findAll();
         return ResponseEntity.status(201).body(allUser);
     }
+    @GetMapping("/single/")
+    public ResponseEntity<User> findId(@RequestParam("id") Long id){
+        var userId = iuserRepository.findByid(id);
+        return  ResponseEntity.status(HttpStatus.OK).body(userId);
+    }
+    @GetMapping("/")
+    public ResponseEntity<List<User>> findByNameIlike(@RequestParam("user") String user) {
+        var userIlike = this.iuserRepository.findUserIlike(user);
+        return ResponseEntity.status(HttpStatus.OK).body(userIlike);
+    }
 }
