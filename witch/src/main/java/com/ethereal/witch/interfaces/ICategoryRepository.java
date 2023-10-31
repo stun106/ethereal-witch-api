@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 @Repository
 public interface ICategoryRepository extends JpaRepository<Category, Long> {
-    Category findByCategoryid(Long nomeCategory);
+    Category findByCategoryid(Long idCategory);
 
     @Query("SELECT c.nomecategory FROM Category c WHERE c.categoryid = :categoryid")
     Object[] findByid(@Param("categoryid") Long id);

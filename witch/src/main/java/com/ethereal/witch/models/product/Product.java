@@ -2,6 +2,7 @@ package com.ethereal.witch.models.product;
 
 import com.ethereal.witch.models.collection.Category;
 
+import com.ethereal.witch.models.product_type.TypeProduct;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -9,7 +10,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Data
 @Entity
@@ -26,6 +26,11 @@ public class Product {
     @Getter
     @Setter
     private BigDecimal valor;
+    @Getter
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "nometype")
+    private TypeProduct nometype;
     @Getter
     @Setter
     @ManyToOne

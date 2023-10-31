@@ -47,4 +47,19 @@ public class CategoryController {
         var categoryByname = this.categoryRepository.findBynamecategoyIlike(nomecategory);
         return ResponseEntity.status(HttpStatus.OK).body(categoryByname);
     }
+    @PutMapping("/change/{id}")
+    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody Category category){
+        Category cate = categoryRepository.findByCategoryid(id);
+        String nomeCateBefore = cate.getNomecategory();
+        if (cate == null){
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error", "usuario não encontrado");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
+        }
+        category.setCategoryid(cate.getCategoryid());
+        this.categoryRepository.save(category);
+        Map<String, String> flashmsg = new HashMap<>();
+        flashmsg.put("msg", "Categoria: " +  nomeCateBefore + " foi alterada para " + category.getNomecategory() + ".");
+        return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
+    }
 }
