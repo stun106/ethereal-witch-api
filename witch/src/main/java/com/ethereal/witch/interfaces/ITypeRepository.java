@@ -16,9 +16,4 @@ public interface ITypeRepository extends JpaRepository<TypeProduct,Long> {
     @Query("SELECT t.typename FROM TypeProduct t WHERE t.typeid = :typeId")
     TypeProduct findByid(@Param("typeId") Long typeId);
 
-    @Query("SELECT p.nomeproduct " +
-            "FROM Product p " +
-             "JOIN TypeProduct tp ON nometype = tp " +
-              "WHERE tp.typename = :type")
-    List<Object[]> findProductByType(@Param("type") String type);
 }

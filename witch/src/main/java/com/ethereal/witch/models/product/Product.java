@@ -28,6 +28,9 @@ public class Product {
     private BigDecimal valor;
     @Getter
     @Setter
+    private String image;
+    @Getter
+    @Setter
     @ManyToOne
     @JoinColumn(name = "nometype")
     private TypeProduct nometype;

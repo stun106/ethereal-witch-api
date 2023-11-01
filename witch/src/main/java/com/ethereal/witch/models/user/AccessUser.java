@@ -1,6 +1,6 @@
 package com.ethereal.witch.models.user;
 
-public enum AcessUser {
+public enum AccessUser {
     USER,
     ADMIN
 }

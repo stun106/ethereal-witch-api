@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 public class User {
@@ -26,6 +25,10 @@ public class User {
     @Getter
     @Setter
     private String password;
+    @Getter
+    @Setter
+    @Enumerated(EnumType.STRING)
+    private AccessUser access;
     @OneToMany(mappedBy = "cartuser")
     private List<CartShopping> carts;
 

@@ -3,8 +3,11 @@ package com.ethereal.witch.controllers;
 import com.ethereal.witch.interfaces.IUserRepository;
 import com.ethereal.witch.models.user.User;
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.ethereal.witch.models.user.UserRecordDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -21,7 +25,9 @@ public class UserController {
     private IUserRepository iuserRepository;
 
     @PostMapping("/create")
-    public ResponseEntity create(@RequestBody User userEntity) {
+    public ResponseEntity create(@RequestBody @Valid UserRecordDto userDto) {
+        var userEntity = new User();
+        BeanUtils.copyProperties(userDto,userEntity);
 
         var user = this.iuserRepository.findByUsername(userEntity.getUsername());
         if (user != null) {
@@ -41,36 +47,57 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<User>> index() {
+    public ResponseEntity index() {
         var allUser = this.iuserRepository.findAll();
+
+        if (allUser.isEmpty()){
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error","Não a usuarios registrados!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
+        }
         return ResponseEntity.status(201).body(allUser);
     }
 
     @GetMapping("/single/")
-    public ResponseEntity<User> findId(@RequestParam("id") Long id) {
-        var userId = iuserRepository.findByid(id);
+    public ResponseEntity<Object> findId(@RequestParam("id") Long id) {
+        Optional<User> userId = Optional.ofNullable(iuserRepository.findByid(id));
+
+        if (userId.isEmpty()){
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error", "Usuario não existe!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(userId);
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<User>> findByNameIlike(@RequestParam("user") String user) {
+    public ResponseEntity findByNameIlike(@RequestParam("user") String user) {
         var userIlike = this.iuserRepository.findUserIlike(user);
+
+        if (userIlike.isEmpty()){
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error", "Usuario não existe!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(userIlike);
     }
 
     @PutMapping("/change/{id}")
-    public ResponseEntity update(@PathVariable("id") Long id, HttpServletRequest request, @RequestBody User user) {
-        User iduser = this.iuserRepository.findByid(id);
-        if (iduser == null) {
+    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody @Valid UserRecordDto userDto) {
+        var user = new User();
+        BeanUtils.copyProperties(userDto,user);
+
+        Optional<User> iduser = Optional.ofNullable(this.iuserRepository.findByid(id));
+        if (iduser.isEmpty()) {
             Map<String, String> flashmsg = new HashMap<>();
             flashmsg.put("error", "usuario não encontrado");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
         }
-        user.setId(iduser.getId());
-        iduser.setName(user.getName());
-        iduser.setPassword(user.getPassword());
-        iduser.setUsername(user.getUsername());
-        this.iuserRepository.save(iduser);
+        user.setId(user.getId());
+        user.setName(user.getName());
+        user.setPassword(user.getPassword());
+        user.setUsername(user.getUsername());
+        this.iuserRepository.save(user);
         Map<String, String> flashmsg = new HashMap<>();
         flashmsg.put("msg", "Usuario: " + user.getUsername() + " Fez alterações com sucesos!");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);

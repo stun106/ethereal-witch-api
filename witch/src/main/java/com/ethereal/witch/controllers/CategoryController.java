@@ -2,7 +2,10 @@ package com.ethereal.witch.controllers;
 
 import com.ethereal.witch.interfaces.ICategoryRepository;
 import com.ethereal.witch.models.collection.Category;
+import com.ethereal.witch.models.collection.CategoryRecordDto;
 import com.ethereal.witch.models.product.Product;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,7 +21,9 @@ public class CategoryController {
     @Autowired
     private ICategoryRepository categoryRepository;
     @PostMapping("/create/auth")
-    public ResponseEntity<Map<String,String>> create(@RequestBody Category categoryEntity){
+    public ResponseEntity<Map<String,String>> create(@RequestBody @Valid CategoryRecordDto categoryDto){
+        var categoryEntity = new Category();
+        BeanUtils.copyProperties(categoryDto,categoryEntity);
         var category = this.categoryRepository.findByCategoryid(categoryEntity.getCategoryid());
         if (category != null){
             Map<String,String> flashMsg = new HashMap<>();

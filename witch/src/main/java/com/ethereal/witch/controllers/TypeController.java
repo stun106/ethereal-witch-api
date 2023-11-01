@@ -3,7 +3,10 @@ package com.ethereal.witch.controllers;
 import com.ethereal.witch.interfaces.ITypeRepository;
 import com.ethereal.witch.models.product.Product;
 import com.ethereal.witch.models.product_type.TypeProduct;
+import com.ethereal.witch.models.product_type.TypeProductRecordDto;
 import com.fasterxml.jackson.databind.ObjectReader;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -22,7 +25,9 @@ public class TypeController {
     private ITypeRepository iTypeRepository;
 
     @PostMapping("/product/auth")
-    public ResponseEntity create(@RequestBody TypeProduct type){
+    public ResponseEntity create(@RequestBody @Valid TypeProductRecordDto typeDto){
+        var type = new TypeProduct();
+        BeanUtils.copyProperties(typeDto,type);
         var typeProduct = this.iTypeRepository.findByTypeid(type.getTypeid());
         if (typeProduct != null){
             Map<String,String> msg =  new HashMap<>();
@@ -40,9 +45,4 @@ public class TypeController {
         return ResponseEntity.status(HttpStatus.OK).body(type);
     }
 
-    @GetMapping("/product/all")
-    public ResponseEntity<List<Object[]>>findProductByType(@RequestParam("type") String type){
-        var allProduct = iTypeRepository.findProductByType(type);
-        return ResponseEntity.status(HttpStatus.OK).body(allProduct);
-    }
 }
