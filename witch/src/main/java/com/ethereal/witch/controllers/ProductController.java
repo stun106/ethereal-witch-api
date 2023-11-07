@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/witch/product")
@@ -52,7 +53,12 @@ public class ProductController {
 
     @GetMapping("/single/")
     public ResponseEntity findId(@RequestParam("id") Long id) {
-       Object[] product = this.productRepository.findIdProduct(id);
+       Optional<Object[]> product = Optional.ofNullable(this.productRepository.findIdProduct(id));
+       if (product.get().length == 0) {
+           Map<String, String> flashmsg = new HashMap<>();
+           flashmsg.put("error", "Produto não Existe!");
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
+       }
        return ResponseEntity.status(HttpStatus.OK).body(product);
     }
 
@@ -88,5 +94,19 @@ public class ProductController {
         product.setNometype(type);
         product.setProductcategory(category);
         this.productRepository.save(product);
+    }
+
+    @DeleteMapping("/del/{id}")
+    public ResponseEntity destroy(@PathVariable("id") Long id){
+        var product = this.productRepository.findByProductid(id);
+        if (product != null){
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error", "Produto não Existe!");
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
+        }
+        Map<String, String> flashmsg = new HashMap<>();
+        flashmsg.put("msg", product.getNomeproduct() + "deletado com sucesso!");
+        this.productRepository.delete(product);
+        return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
     }
 }

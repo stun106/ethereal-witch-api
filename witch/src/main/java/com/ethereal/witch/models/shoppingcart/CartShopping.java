@@ -21,6 +21,8 @@ public class CartShopping {
     @ManyToOne
     @JoinColumn(name = "cartproductid")
     private Product cartproduct;
+    @Getter
+    @Setter
     @ManyToOne
     @JoinColumn(name = "cartuserid")
     private User cartuser;

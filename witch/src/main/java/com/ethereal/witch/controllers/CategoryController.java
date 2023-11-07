@@ -53,18 +53,35 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.OK).body(categoryByname);
     }
     @PutMapping("/change/{id}")
-    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody Category category){
-        Category cate = categoryRepository.findByCategoryid(id);
-        String nomeCateBefore = cate.getNomecategory();
-        if (cate == null){
+    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody CategoryRecordDto categoryDto){
+        var category = new Category();
+        BeanUtils.copyProperties(categoryDto,category);
+        Optional<Category> cate = Optional.ofNullable(categoryRepository.findByCategoryid(id));
+        String nomeCateBefore = cate.get().getNomecategory();
+        if (cate.isEmpty()){
             Map<String, String> flashmsg = new HashMap<>();
             flashmsg.put("error", "usuario não encontrado");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
         }
-        category.setCategoryid(cate.getCategoryid());
+        category.setCategoryid(cate.get().getCategoryid());
         this.categoryRepository.save(category);
         Map<String, String> flashmsg = new HashMap<>();
         flashmsg.put("msg", "Categoria: " +  nomeCateBefore + " foi alterada para " + category.getNomecategory() + ".");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
     }
+
+    @DeleteMapping("/del/{id}")
+    public ResponseEntity destroy(@PathVariable("id") Long id){
+        Optional<Category> category = Optional.ofNullable(this.categoryRepository.findByCategoryid(id));
+        if(category.isEmpty()){
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error", "usuario não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
+        }
+        this.categoryRepository.delete(category.get());
+        Map<String, String> flashmsg = new HashMap<>();
+        flashmsg.put("msg", "a collection " + category.get().getNomecategory() + " foi deletada com sucesso!");
+        return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
+    }
+
 }

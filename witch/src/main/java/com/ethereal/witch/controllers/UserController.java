@@ -27,7 +27,7 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity create(@RequestBody @Valid UserRecordDto userDto) {
         var userEntity = new User();
-        BeanUtils.copyProperties(userDto,userEntity);
+        BeanUtils.copyProperties(userDto, userEntity);
 
         var user = this.iuserRepository.findByUsername(userEntity.getUsername());
         if (user != null) {
@@ -50,9 +50,9 @@ public class UserController {
     public ResponseEntity index() {
         var allUser = this.iuserRepository.findAll();
 
-        if (allUser.isEmpty()){
+        if (allUser.isEmpty()) {
             Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error","Não a usuarios registrados!");
+            flashmsg.put("error", "Não a usuarios registrados!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
         }
         return ResponseEntity.status(201).body(allUser);
@@ -62,7 +62,7 @@ public class UserController {
     public ResponseEntity<Object> findId(@RequestParam("id") Long id) {
         Optional<User> userId = Optional.ofNullable(iuserRepository.findByid(id));
 
-        if (userId.isEmpty()){
+        if (userId.isEmpty()) {
             Map<String, String> flashmsg = new HashMap<>();
             flashmsg.put("error", "Usuario não existe!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
@@ -74,7 +74,7 @@ public class UserController {
     public ResponseEntity findByNameIlike(@RequestParam("user") String user) {
         var userIlike = this.iuserRepository.findUserIlike(user);
 
-        if (userIlike.isEmpty()){
+        if (userIlike.isEmpty()) {
             Map<String, String> flashmsg = new HashMap<>();
             flashmsg.put("error", "Usuario não existe!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
@@ -85,21 +85,31 @@ public class UserController {
     @PutMapping("/change/{id}")
     public ResponseEntity update(@PathVariable("id") Long id, @RequestBody @Valid UserRecordDto userDto) {
         var user = new User();
-        BeanUtils.copyProperties(userDto,user);
-
+        BeanUtils.copyProperties(userDto, user);
         Optional<User> iduser = Optional.ofNullable(this.iuserRepository.findByid(id));
         if (iduser.isEmpty()) {
             Map<String, String> flashmsg = new HashMap<>();
             flashmsg.put("error", "usuario não encontrado");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
         }
-        user.setId(user.getId());
-        user.setName(user.getName());
-        user.setPassword(user.getPassword());
-        user.setUsername(user.getUsername());
+        user.setId(iduser.get().getId());
         this.iuserRepository.save(user);
         Map<String, String> flashmsg = new HashMap<>();
         flashmsg.put("msg", "Usuario: " + user.getUsername() + " Fez alterações com sucesos!");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
+    }
+
+    @DeleteMapping("/del/{id}")
+    public ResponseEntity destroy(@PathVariable("id") Long id) {
+        Optional<User> user = Optional.ofNullable(this.iuserRepository.findByid(id));
+        if (user.isEmpty()) {
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error", "Usuario não Existe!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
+        }
+        this.iuserRepository.delete(user.get());
+        Map<String, String> flashmsg = new HashMap<>();
+        flashmsg.put("msg", user.get().getName() + " foi deletado com sucesso!");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
     }
 }
