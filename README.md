@@ -1,4 +1,4 @@
-<p align="center"><a href="link_para_sua_documentacao" target="_blank"><img src="https://example.com/seu-logo.png" width="400" alt="Logo da API"></a></p>
+<p align="center"><a href="https://spring.io/" target="_blank"><img src="https://spring.io/img/spring-2.svg" width="400" alt="Spring Logo"></a></p>
 
 # API Ethereal Witch
 
