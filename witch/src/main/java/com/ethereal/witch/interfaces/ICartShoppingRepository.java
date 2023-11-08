@@ -13,14 +13,13 @@ import java.util.Optional;
 @Repository
 public interface ICartShoppingRepository extends JpaRepository<CartShopping, Long> {
     CartShopping findByCartid(Long id);
-    Optional<CartShopping> findByCartproductProductid(Long id);
+
     @Query("SELECT p.nomeproduct, p.valor " +
             "FROM CartShopping cs " +
             "JOIN cs.cartuser u " +
             "JOIN cs.cartproduct p " +
             "WHERE u.id = :userId")
     List<Object[]> findCartShoppingInfoByUsername(@Param("userId") Long UserId);
-    @Query("DELETE FROM CartShopping WHERE cartproduct = :id")
-    void destroy(@Param("id") Long id);
+
 }
 

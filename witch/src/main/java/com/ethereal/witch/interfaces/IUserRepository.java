@@ -15,8 +15,6 @@ import java.util.UUID;
 public interface IUserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     User findByid(@Param("id") Long id);
-    @Override
-    List<User> findAll();
     @Query("SELECT u FROM User u WHERE LOWER(u.name) ILIKE LOWER(CONCAT('%', :user ,'%'))")
     List<User> findUserIlike(@Param("user") String user);
 }

@@ -13,7 +13,5 @@ import java.util.List;
 @Repository
 public interface ITypeRepository extends JpaRepository<TypeProduct,Long> {
     TypeProduct findByTypeid(Long id);
-    @Query("SELECT t.typename FROM TypeProduct t WHERE t.typeid = :typeId")
-    TypeProduct findByid(@Param("typeId") Long typeId);
 
 }

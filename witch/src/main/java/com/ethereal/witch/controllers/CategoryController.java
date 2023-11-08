@@ -1,9 +1,13 @@
 package com.ethereal.witch.controllers;
 
 import com.ethereal.witch.interfaces.ICategoryRepository;
+import com.ethereal.witch.interfaces.IUserRepository;
 import com.ethereal.witch.models.collection.Category;
 import com.ethereal.witch.models.collection.CategoryRecordDto;
 import com.ethereal.witch.models.product.Product;
+import com.ethereal.witch.models.user.AccessUser;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +20,28 @@ import java.sql.Array;
 import java.util.*;
 
 @RestController
-@RequestMapping("/witch/collection")
+@RequestMapping("/witch/collection/")
 public class CategoryController {
     @Autowired
     private ICategoryRepository categoryRepository;
+    @Autowired
+    private IUserRepository userRepository;
     @PostMapping("/create/auth")
-    public ResponseEntity<Map<String,String>> create(@RequestBody @Valid CategoryRecordDto categoryDto){
+    public ResponseEntity<Map<String,String>> create(@RequestBody  @Valid CategoryRecordDto categoryDto,
+                                                     HttpServletRequest request){
         var categoryEntity = new Category();
         BeanUtils.copyProperties(categoryDto,categoryEntity);
         var category = this.categoryRepository.findByCategoryid(categoryEntity.getCategoryid());
+        var user = userRepository.findByid((Long) request.getAttribute("idUser"));
+        if (user.getAccess() != AccessUser.ADMIN){
+            Map<String,String> flashMsg = new HashMap<>();
+            flashMsg.put("error","Requer autorização! entre em contato com o desenvolvedor." +
+                    " Email: antoniojr.strong@gmail.com");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(flashMsg);
+        }
         if (category != null){
             Map<String,String> flashMsg = new HashMap<>();
-            flashMsg.put("error","Algo de errado, Verifique seus dados!");
+            flashMsg.put("error","Essa categoria ja existe!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashMsg);
         }
         this.categoryRepository.save(categoryEntity);
