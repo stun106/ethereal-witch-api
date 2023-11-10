@@ -1,10 +1,13 @@
 package com.ethereal.witch.controllers;
 
 import com.ethereal.witch.interfaces.ITypeRepository;
+import com.ethereal.witch.interfaces.IUserRepository;
 import com.ethereal.witch.models.product.Product;
 import com.ethereal.witch.models.product_type.TypeProduct;
 import com.ethereal.witch.models.product_type.TypeProductRecordDto;
+import com.ethereal.witch.models.user.AccessUser;
 import com.fasterxml.jackson.databind.ObjectReader;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +27,20 @@ import java.util.Optional;
 public class TypeController {
     @Autowired
     private ITypeRepository iTypeRepository;
+    @Autowired
+    private IUserRepository userRepository;
 
     @PostMapping("/product/auth")
-    public ResponseEntity create(@RequestBody @Valid TypeProductRecordDto typeDto){
+    public ResponseEntity create(@RequestBody @Valid TypeProductRecordDto typeDto, HttpServletRequest request){
+        var user = userRepository.findByid((Long) request.getAttribute("idUser"));
         var type = new TypeProduct();
         BeanUtils.copyProperties(typeDto,type);
         var typeProduct = this.iTypeRepository.findByTypeid(type.getTypeid());
-        if (typeProduct != null){
-            Map<String,String> msg =  new HashMap<>();
-                    msg.put("error","Algo deu errado, verifique seus dados!");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+        if (user.getAccess() != AccessUser.ADMIN){
+            Map<String,String> flashMsg = new HashMap<>();
+            flashMsg.put("error","Requer autorização! entre em contato com o desenvolvedor." +
+                    " Email: antoniojr.strong@gmail.com");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(flashMsg);
         }
         this.iTypeRepository.save(type);
         Map<String,String> msg = new HashMap<>();
