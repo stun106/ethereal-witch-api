@@ -47,6 +47,16 @@ public class TypeController {
                 msg.put("msg", type.getTypename() + " adicionado com sucesso!");
         return ResponseEntity.status(HttpStatus.CREATED).body(msg);
     }
+    @GetMapping("/all")
+    public ResponseEntity findAll(){
+        Optional<List<TypeProduct>> type = Optional.ofNullable(iTypeRepository.findAll());
+        if (type.isEmpty()){
+            Map<String, String> flashmsg = new HashMap<>();
+            flashmsg.put("error","Esse tipo de produto não Existe!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(type);
+    }
     @GetMapping("/product/")
     public ResponseEntity findId (@RequestParam("typeId") Long id){
         Optional<TypeProduct> type = Optional.ofNullable(iTypeRepository.findByTypeid(id));

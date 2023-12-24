@@ -39,11 +39,6 @@ public class CategoryController {
                     " Email: antoniojr.strong@gmail.com");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(flashMsg);
         }
-        if (category != null){
-            Map<String,String> flashMsg = new HashMap<>();
-            flashMsg.put("error","Essa categoria ja existe!");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashMsg);
-        }
         this.categoryRepository.save(categoryEntity);
         Map<String,String> flashMsg = new HashMap<>();
         flashMsg.put("msg", categoryEntity.getNomecategory() + " Adicionado(a) como nova Collections!");
@@ -89,7 +84,7 @@ public class CategoryController {
         Optional<Category> category = Optional.ofNullable(this.categoryRepository.findByCategoryid(id));
         if(category.isEmpty()){
             Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error", "usuario não encontrado");
+            flashmsg.put("error", "Categoria não existe!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
         }
         this.categoryRepository.delete(category.get());
