@@ -1,22 +1,18 @@
-package com.ethereal.witch.controllers;
+package com.ethereal.witch.web.controllers;
 
-import com.ethereal.witch.interfaces.ICategoryRepository;
-import com.ethereal.witch.interfaces.IUserRepository;
+import com.ethereal.witch.repository.ICategoryRepository;
+import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.models.collection.Category;
 import com.ethereal.witch.models.collection.CategoryRecordDto;
-import com.ethereal.witch.models.product.Product;
 import com.ethereal.witch.models.user.AccessUser;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Array;
 import java.util.*;
 
 @RestController

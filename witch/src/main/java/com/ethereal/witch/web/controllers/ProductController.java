@@ -1,9 +1,9 @@
-package com.ethereal.witch.controllers;
+package com.ethereal.witch.web.controllers;
 
-import com.ethereal.witch.interfaces.ICategoryRepository;
-import com.ethereal.witch.interfaces.IProductRepository;
+import com.ethereal.witch.repository.ICategoryRepository;
+import com.ethereal.witch.repository.IProductRepository;
 
-import com.ethereal.witch.interfaces.ITypeRepository;
+import com.ethereal.witch.repository.ITypeRepository;
 import com.ethereal.witch.models.product.Product;
 
 import com.ethereal.witch.models.product.ProductRecordDto;

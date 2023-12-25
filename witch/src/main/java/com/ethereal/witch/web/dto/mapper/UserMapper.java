@@ -4,7 +4,6 @@ import com.ethereal.witch.models.user.User;
 import com.ethereal.witch.web.dto.UserCreateDto;
 import com.ethereal.witch.web.dto.UserResponseDto;
 import org.modelmapper.ModelMapper;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,17 +1,14 @@
-package com.ethereal.witch.controllers;
+package com.ethereal.witch.web.controllers;
 
-import com.ethereal.witch.interfaces.ITypeRepository;
-import com.ethereal.witch.interfaces.IUserRepository;
-import com.ethereal.witch.models.product.Product;
+import com.ethereal.witch.repository.ITypeRepository;
+import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.models.product_type.TypeProduct;
 import com.ethereal.witch.models.product_type.TypeProductRecordDto;
 import com.ethereal.witch.models.user.AccessUser;
-import com.fasterxml.jackson.databind.ObjectReader;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
