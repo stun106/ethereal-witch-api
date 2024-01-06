@@ -1,7 +1,7 @@
 package com.ethereal.witch.service.exception;
 
-public class UsernameUniqueViolationExeception extends RuntimeException {
-    public UsernameUniqueViolationExeception(String message) {
+public class UniqueViolationExeception extends RuntimeException {
+    public UniqueViolationExeception(String message) {
         super(message);
     }
 }
