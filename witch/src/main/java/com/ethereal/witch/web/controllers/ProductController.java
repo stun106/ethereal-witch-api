@@ -1,13 +1,19 @@
 package com.ethereal.witch.web.controllers;
 
+import com.ethereal.witch.models.collection.Category;
+import com.ethereal.witch.models.product_type.TypeProduct;
 import com.ethereal.witch.repository.ICategoryRepository;
 import com.ethereal.witch.repository.IProductRepository;
 
 import com.ethereal.witch.repository.ITypeRepository;
 import com.ethereal.witch.models.product.Product;
 
-import com.ethereal.witch.models.product.ProductRecordDto;
+import com.ethereal.witch.service.ProductService;
+import com.ethereal.witch.web.dto.ProductCreateDto;
+import com.ethereal.witch.web.dto.ProductResponseDto;
+import com.ethereal.witch.web.dto.mapper.ProductMapper;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,11 +22,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/witch/product")
+@AllArgsConstructor
 public class ProductController {
     @Autowired
     private IProductRepository productRepository;
@@ -28,85 +36,48 @@ public class ProductController {
     private ICategoryRepository categoryRepository;
     @Autowired
     private ITypeRepository typeRepository;
+    private final ProductService productService;
 
     @PostMapping("/create/auth")
-    public ResponseEntity create(@RequestBody @Valid ProductRecordDto productDto) {
-        var productEntity = new Product();
-        BeanUtils.copyProperties(productDto, productEntity);
-        var product = this.productRepository.findByNomeproduct(productEntity.getNomeproduct());
-        var category = categoryRepository.findByCategoryid(productEntity.getProductcategory().getCategoryid());
-        var type = typeRepository.findByTypeid(productEntity.getNometype().getTypeid());
-
-        if (product != null) {
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error", "Algo de errado, verifique seus dados!");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
-        }
-        Map<String, String> flashmsg = new HashMap<>();
-
-        productEntity.setNometype(type);
-        productEntity.setProductcategory(category);
-        this.productRepository.save(productEntity);
-        flashmsg.put("msg", productEntity.getNomeproduct() + " cadastrado com sucesso");
-        return ResponseEntity.status(HttpStatus.CREATED).body(flashmsg);
+    public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody ProductCreateDto productDto) {
+        Category productCategory = categoryRepository.findByCategoryid(productDto.getProductcategory().getCategoryid());
+        TypeProduct typeProduct = typeRepository.findByTypeid(productDto.getNometype().getTypeid());
+        productDto.setNometype(typeProduct);
+        productDto.setProductcategory(productCategory);
+        Product product = productService.saveProduct(ProductMapper.toProduct(productDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProductMapper.toProductDto(product));
     }
 
-    @GetMapping("/single/")
-    public ResponseEntity findId(@RequestParam("id") Long id) {
-       Optional<Object[]> product = Optional.ofNullable(this.productRepository.findIdProduct(id));
-       if (product.get().length == 0) {
-           Map<String, String> flashmsg = new HashMap<>();
-           flashmsg.put("error", "Produto não Existe!");
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
-       }
-       return ResponseEntity.status(HttpStatus.OK).body(product);
+    @GetMapping("/single/{id}")
+    public ResponseEntity<ProductResponseDto> findId(@PathVariable("id") Long id) {
+       Product product = productService.findById(id);
+       return ResponseEntity.status(HttpStatus.OK).body(ProductMapper.toProductDto(product));
     }
 
-    @GetMapping("/type/")
-    public ResponseEntity findProductByType(@RequestParam("nome") String type){
-        var allProduct = productRepository.findProductByType(type);
-        if (allProduct.isEmpty()){
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error","Não a produtos registrados neste tipo de produto!");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
-        }
+    @GetMapping("/type/{nome}")
+    public ResponseEntity<List<Object[]>> findProductByType(@PathVariable("nome") String nome){
+       List<Object[]> allProduct = productService.findAllForType(nome);
         return ResponseEntity.status(HttpStatus.OK).body(allProduct);
     }
-    @GetMapping("/collection/")
-    public ResponseEntity findProductCat(@RequestParam("nome") String ncat){
-        var product = this.productRepository.findProductCategory(ncat);
-        if (product.isEmpty()){
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error","Não a produtos registrados nesta categoria!");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
-        }
+    @GetMapping("/collection/{nome}")
+    public ResponseEntity<List<Object[]>> findProductCat(@PathVariable("nome") String ncat){
+        List<Object[]> product = productService.findAllForCategory(ncat) ;
         return ResponseEntity.status(HttpStatus.OK).body(product);
     }
 
     @PutMapping("/change/{id}/auth")
-    public void update(@PathVariable("id") Long id, @RequestBody @Valid ProductRecordDto productDto){
-        var product = new Product();
-        BeanUtils.copyProperties(productDto,product);
-        var produtcId = this.productRepository.findByProductid(id);
-        var type = this.typeRepository.findByTypeid(produtcId.getNometype().getTypeid());
-        var category = categoryRepository.findByCategoryid(produtcId.getProductcategory().getCategoryid());
-        product.setProductid(id);
-        product.setNometype(type);
-        product.setProductcategory(category);
-        this.productRepository.save(product);
+    public ResponseEntity<Map<String,String>> update(@PathVariable("id") Long id, @Valid @RequestBody ProductCreateDto productDto){
+        productService.updateProduct(id,productDto.getNomeproduct(),productDto.getValor(),productDto.getImage());
+        Map<String, String> flashMsg = new HashMap<>();
+        flashMsg.put("msg",String.format("product changed succefully for id {%d}.",id));
+        return ResponseEntity.status(HttpStatus.OK).body(flashMsg);
     }
 
     @DeleteMapping("/del/{id}")
-    public ResponseEntity destroy(@PathVariable("id") Long id){
-        var product = this.productRepository.findByProductid(id);
-        if (product != null){
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error", "Produto não Existe!");
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
-        }
+    public ResponseEntity<Map<String,String>> destroy(@PathVariable("id") Long id){
+        productService.destroyProduct(id);
         Map<String, String> flashmsg = new HashMap<>();
-        flashmsg.put("msg", product.getNomeproduct() + "deletado com sucesso!");
-        this.productRepository.delete(product);
+        flashmsg.put("msg",String.format("Product deleted succefully for id {%d}",id));
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
     }
 }
