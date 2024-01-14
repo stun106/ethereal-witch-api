@@ -1,4 +1,4 @@
-package com.ethereal.witch.web.dto;
+package com.ethereal.witch.web.dto.productDto;
 
 import com.ethereal.witch.models.collection.Category;
 import com.ethereal.witch.models.product_type.TypeProduct;
@@ -17,11 +17,11 @@ import java.math.BigDecimal;
 @Setter
 public class ProductCreateDto {
         @NotBlank
-        String nomeproduct;
+        private String nomeproduct;
         @NotNull
-        BigDecimal valor;
+        private BigDecimal valor;
         @NotNull
-        String image;
+        private String image;
         TypeProduct nometype;
-        Category productcategory;
+        private Category productcategory;
 }

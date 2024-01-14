@@ -1,4 +1,4 @@
-package com.ethereal.witch.web.dto;
+package com.ethereal.witch.web.dto.userDto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserPassword {
+public class UserPasswordDto {
     private String currentPassword;
     @NotBlank
     @Pattern(regexp = "^(?=.*[@#$%])(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9@#$%]{8,}$", message = "Your password must have 8 digits, a special character, an uppercase letter and a number to be valid.")

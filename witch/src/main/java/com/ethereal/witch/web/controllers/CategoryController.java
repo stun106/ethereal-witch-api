@@ -3,11 +3,13 @@ package com.ethereal.witch.web.controllers;
 import com.ethereal.witch.repository.ICategoryRepository;
 import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.models.collection.Category;
-import com.ethereal.witch.models.collection.CategoryRecordDto;
-import com.ethereal.witch.models.user.AccessUser;
+import com.ethereal.witch.service.CategoryService;
+import com.ethereal.witch.web.dto.CategoryCreateDto;
+import com.ethereal.witch.web.dto.CategoryResponseDto;
+import com.ethereal.witch.web.dto.mapper.CategoryMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,75 +19,46 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/witch/collection/")
+@RequiredArgsConstructor
 public class CategoryController {
-    @Autowired
-    private ICategoryRepository categoryRepository;
-    @Autowired
-    private IUserRepository userRepository;
+    private final CategoryService categoryService;
+
     @PostMapping("/create/auth")
-    public ResponseEntity<Map<String,String>> create(@RequestBody  @Valid CategoryRecordDto categoryDto,
+    public ResponseEntity<Map<String,String>> create(@RequestBody  @Valid CategoryCreateDto categoryDto,
                                                      HttpServletRequest request){
-        var categoryEntity = new Category();
-        BeanUtils.copyProperties(categoryDto,categoryEntity);
-        var category = this.categoryRepository.findByCategoryid(categoryEntity.getCategoryid());
-        var user = userRepository.findByid((Long) request.getAttribute("idUser"));
-        if (user.getAccess() != AccessUser.ADMIN){
-            Map<String,String> flashMsg = new HashMap<>();
-            flashMsg.put("error","Requer autorização! entre em contato com o desenvolvedor." +
-                    " Email: antoniojr.strong@gmail.com");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(flashMsg);
-        }
-        this.categoryRepository.save(categoryEntity);
+        categoryService.saveCategory(CategoryMapper.toCategory(categoryDto),request);
         Map<String,String> flashMsg = new HashMap<>();
-        flashMsg.put("msg", categoryEntity.getNomecategory() + " Adicionado(a) como nova Collections!");
+        flashMsg.put("msg", categoryDto.getNomecategory() + " created successfuly!");
         return ResponseEntity.status(HttpStatus.CREATED).body(flashMsg);
     }
 
-    @GetMapping("/single/")
-    public ResponseEntity<Object[]> findById(@RequestParam("categoryId") Long id){
-        var categoryId = this.categoryRepository.findByid(id);
-        return ResponseEntity.status(HttpStatus.OK).body(categoryId);
+    @GetMapping("/single/{id}")
+    public ResponseEntity<CategoryResponseDto> findById(@PathVariable("id") Long id){
+        Category categoryId = categoryService.categoryForId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(CategoryMapper.toDto(categoryId));
     }
     @GetMapping("/all")
-    public ResponseEntity<List<Object[]>> index() {
-        var allCategory = this.categoryRepository.findAllNameCategory();
-        return ResponseEntity.status(HttpStatus.OK).body(allCategory);
+    public ResponseEntity<List<CategoryResponseDto>> index() {
+        List<Category> allCategory = this.categoryService.findAllCategory();
+        return ResponseEntity.status(HttpStatus.OK).body(CategoryMapper.toListCategory(allCategory));
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<Object[]>> getCategoryByid(@RequestParam("nomecategory") String nomecategory){
-        var categoryByname = this.categoryRepository.findBynamecategoyIlike(nomecategory);
-        return ResponseEntity.status(HttpStatus.OK).body(categoryByname);
-    }
-    @PutMapping("/change/{id}")
-    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody CategoryRecordDto categoryDto){
-        var category = new Category();
-        BeanUtils.copyProperties(categoryDto,category);
-        Optional<Category> cate = Optional.ofNullable(categoryRepository.findByCategoryid(id));
-        String nomeCateBefore = cate.get().getNomecategory();
-        if (cate.isEmpty()){
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error", "usuario não encontrado");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
-        }
-        category.setCategoryid(cate.get().getCategoryid());
-        this.categoryRepository.save(category);
+    @PutMapping("/change/{id}/auth")
+    public ResponseEntity<Map<String,String>> update(@PathVariable("id") Long id, @RequestBody CategoryCreateDto categoryDto){
+        Category cate = categoryService.categoryForId(id);
+        String nomeCateBefore = cate.getNomecategory();
+        categoryService.updateCategory(id,categoryDto.getNomecategory());
         Map<String, String> flashmsg = new HashMap<>();
-        flashmsg.put("msg", "Categoria: " +  nomeCateBefore + " foi alterada para " + category.getNomecategory() + ".");
+        flashmsg.put("msg", "Category: " +  nomeCateBefore + " updated to  " + cate.getNomecategory() + ".");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
     }
 
     @DeleteMapping("/del/{id}")
-    public ResponseEntity destroy(@PathVariable("id") Long id){
-        Optional<Category> category = Optional.ofNullable(this.categoryRepository.findByCategoryid(id));
-        if(category.isEmpty()){
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error", "Categoria não existe!");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(flashmsg);
-        }
-        this.categoryRepository.delete(category.get());
+    public ResponseEntity<Map<String,String>> destroy(@PathVariable("id") Long id){
+        Category category = categoryService.categoryForId(id);
+        categoryService.destroyCategory(id);
         Map<String, String> flashmsg = new HashMap<>();
-        flashmsg.put("msg", "a collection " + category.get().getNomecategory() + " foi deletada com sucesso!");
+        flashmsg.put("msg", "Category " + category.getNomecategory() + " deleted succesfuly!");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
     }
 

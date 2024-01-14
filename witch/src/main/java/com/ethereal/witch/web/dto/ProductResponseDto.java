@@ -1,4 +1,4 @@
-package com.ethereal.witch.web.dto;
+package com.ethereal.witch.web.dto.productDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ProductResponseDto {
+public class
+ProductResponseDto {
     String nomeproduct;
     BigDecimal valor;
     String image;

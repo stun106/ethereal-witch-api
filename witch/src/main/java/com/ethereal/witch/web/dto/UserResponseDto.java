@@ -1,4 +1,4 @@
-package com.ethereal.witch.web.dto;
+package com.ethereal.witch.web.dto.userDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
