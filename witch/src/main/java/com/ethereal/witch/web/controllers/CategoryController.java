@@ -44,19 +44,19 @@ public class CategoryController {
     }
 
     @PutMapping("/change/{id}/auth")
-    public ResponseEntity<Map<String,String>> update(@PathVariable("id") Long id, @RequestBody CategoryCreateDto categoryDto){
+    public ResponseEntity<Map<String,String>> update(@PathVariable("id") Long id, @RequestBody CategoryCreateDto categoryDto, HttpServletRequest request){
         Category cate = categoryService.categoryForId(id);
         String nomeCateBefore = cate.getNomecategory();
-        categoryService.updateCategory(id,categoryDto.getNomecategory());
+        categoryService.updateCategory(id,categoryDto.getNomecategory(),request);
         Map<String, String> flashmsg = new HashMap<>();
         flashmsg.put("msg", "Category: " +  nomeCateBefore + " updated to  " + cate.getNomecategory() + ".");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
     }
 
-    @DeleteMapping("/del/{id}")
-    public ResponseEntity<Map<String,String>> destroy(@PathVariable("id") Long id){
+    @DeleteMapping("/del/{id}/auth")
+    public ResponseEntity<Map<String,String>> destroy(@PathVariable("id") Long id, HttpServletRequest request){
         Category category = categoryService.categoryForId(id);
-        categoryService.destroyCategory(id);
+        categoryService.destroyCategory(id,request);
         Map<String, String> flashmsg = new HashMap<>();
         flashmsg.put("msg", "Category " + category.getNomecategory() + " deleted succesfuly!");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);

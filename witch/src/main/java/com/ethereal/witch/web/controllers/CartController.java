@@ -1,13 +1,19 @@
 package com.ethereal.witch.web.controllers;
 
+import com.ethereal.witch.models.product.Product;
+import com.ethereal.witch.models.user.User;
 import com.ethereal.witch.repository.ICartShoppingRepository;
 import com.ethereal.witch.repository.IProductRepository;
 import com.ethereal.witch.repository.IUserRepository;
 
 import com.ethereal.witch.models.shoppingcart.CartShopping;
 
+import com.ethereal.witch.service.CartService;
+import com.ethereal.witch.service.ProductService;
+import com.ethereal.witch.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +23,11 @@ import java.util.*;
 
 @RestController
 @RequestMapping("witch/cart")
+@RequiredArgsConstructor
 public class CartController {
-
+    private final CartService cartService;
+    private final UserService userService;
+    private final ProductService productService;
     @Autowired
     private ICartShoppingRepository cartShoppingRepository;
     @Autowired
@@ -27,45 +36,29 @@ public class CartController {
     private IUserRepository userRepository;
     @PostMapping("/create/auth")
     public ResponseEntity create(@RequestBody CartShopping cart, HttpServletRequest request) {
-
-        var cartId = cartShoppingRepository.findByCartid(cart.getCartid());
-        var cartProduct = productRepository.findByProductid(cart.getCartproduct().getProductid());
-        var idUser = userRepository.findByid((Long) request.getAttribute("idUser"));
-
-        if (cartId != null) {
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error", "Algo deu errado, Verifique seus dados!");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(flashmsg);
-        }
-
-        cart.setCartproduct(cartProduct);
-        cart.setCartuser(idUser);
-        this.cartShoppingRepository.save(cart);
-
+        Product product = productService.findById(cart.getCartproduct().getProductid());
+        User user = userService.findById((Long) request.getAttribute("idUser"));
+        cart.setCartproduct(product);
+        cart.setCartuser(user);
+        CartShopping cartshp = cartService.saveCart(cart);
         Map<String, String> flashmsg = new HashMap<>();
-        flashmsg.put("msg", "Produto " + cartProduct.getNomeproduct() + " Adicionado!");
+        flashmsg.put("msg", "Produto " + cartshp.getCartproduct().getNomeproduct()  + " Adicionado!");
         return ResponseEntity.status(HttpStatus.CREATED).body(flashmsg);
 
     }
 
     @GetMapping("/user/auth")
-    public Object getAllCartProductsByUser(HttpServletRequest request){
-        var idUser = userRepository.findByid((Long) request.getAttribute("idUser"));
-        return this.cartShoppingRepository.findCartShoppingInfoByUsername(idUser.getId());
+    public ResponseEntity<List<Object>> getAllCartProductsByUser(HttpServletRequest request){
+        List<Object> cart = cartService.findCartInfoByUser(request);
+        return ResponseEntity.status(HttpStatus.OK).body(cart);
     }
 
-    @DeleteMapping("/del/{id}")
+    @DeleteMapping("/del/{id}/auth")
     public ResponseEntity destroy(@PathVariable("id") Long id) {
-        Optional<CartShopping> product = Optional.ofNullable(cartShoppingRepository.findByCartid(id));
-
-        if (product.isEmpty()){
-            Map<String, String> flashmsg = new HashMap<>();
-            flashmsg.put("error", "Produto não encontrado!");
-            return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
-        }
-        this.cartShoppingRepository.delete(product.get());
+        CartShopping cart = cartService.findByCartid(id);
+        cartService.destroyCart(id);
         Map<String, String> flashmsg = new HashMap<>();
-        flashmsg.put("msg", product.get().getCartproduct().getNomeproduct() + " foi removido com sucesso!");
+        flashmsg.put("msg", cart.getCartproduct().getNomeproduct() + " foi removido com sucesso!");
         return ResponseEntity.status(HttpStatus.OK).body(flashmsg);
         }
 }
