@@ -3,40 +3,49 @@ package com.ethereal.witch.service;
 import com.ethereal.witch.models.collection.Category;
 import com.ethereal.witch.models.product.Product;
 import com.ethereal.witch.models.product_type.TypeProduct;
-import com.ethereal.witch.repository.ICategoryRepository;
+import com.ethereal.witch.models.user.AccessUser;
 import com.ethereal.witch.repository.IProductRepository;
 import com.ethereal.witch.repository.ITypeRepository;
+import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.service.exception.EntityNotfoundException;
 import com.ethereal.witch.service.exception.UniqueViolationExeception;
-import com.ethereal.witch.web.dto.ProductCreateDto;
-import com.ethereal.witch.web.dto.ProductResponseDto;
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import com.ethereal.witch.service.exception.UnnauthorizedException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductService {
     private final IProductRepository iProductRepository;
-    private final ICategoryRepository iCategoryRepository;
+    private final CategoryService categoryService;
     private final ITypeRepository iTypeRepository;
-    public Product saveProduct (Product product){
+    private final IUserRepository iUserRepository;
+
+    private AccessUser getUserRole(HttpServletRequest request){
+        return iUserRepository.findByid((Long) request.getAttribute("idUser")).getAccess();
+    }
+    @Transactional
+    public Product saveProduct (Product product,HttpServletRequest request){
         Product newProduct = iProductRepository.findByNomeproduct(product.getNomeproduct());
-        if (newProduct != null){
+        if (getUserRole(request) != AccessUser.ADMIN) {
+            throw new UnnauthorizedException("Requires authorization! Please contact the developer." +
+                    " Email: antoniojr.strong@gmail.com");
+        }else if(newProduct != null){
             throw new UniqueViolationExeception(String.format("Product {%s} Already created.",product.getNomeproduct()));
         }else{
-            return iProductRepository.save(product);
+        return iProductRepository.save(product);
         }
     }
+    @Transactional(readOnly = true)
     public Product findById(Long id){
         return iProductRepository.findByProductid(id).orElseThrow(()->
                 new EntityNotfoundException(String.format("Product with id: {%s} not exists.",id)));
     }
+    @Transactional(readOnly = true)
     public List<Object[]> findAllForType(String type){
         List<Object[]> findProduct = iProductRepository.findProductByType(type);
         if (findProduct.isEmpty()){
@@ -45,7 +54,7 @@ public class ProductService {
             return iProductRepository.findProductByType(type);
         }
     }
-
+    @Transactional(readOnly = true)
     public List<Object[]> findAllForCategory(String category){
         List<Object[]> findProduct = iProductRepository.findProductCategory(category);
         if (findProduct.isEmpty()){
@@ -54,10 +63,15 @@ public class ProductService {
             return iProductRepository.findProductCategory(category);
         }
     }
-    public Product updateProduct(Long id, String nProduct, BigDecimal value, String image){
+    @Transactional
+    public Product updateProduct(Long id, String nProduct, BigDecimal value, String image,HttpServletRequest request){
+        if(getUserRole(request) != AccessUser.ADMIN){
+            throw new UnnauthorizedException("Requires authorization! Please contact the developer." +
+                    " Email: antoniojr.strong@gmail.com");
+        }
         Product produtcId = findById(id);
-        var type = iTypeRepository.findByTypeid(produtcId.getNometype().getTypeid());
-        var category = iCategoryRepository.findByCategoryid(produtcId.getProductcategory().getCategoryid());
+        TypeProduct type = iTypeRepository.findByTypeid(produtcId.getNometype().getTypeid());
+        Category category = categoryService.categoryForId(produtcId.getProductcategory().getCategoryid());
         produtcId.setNomeproduct(nProduct);
         produtcId.setValor(value);
         produtcId.setImage(image);
@@ -66,8 +80,12 @@ public class ProductService {
         iProductRepository.save(produtcId);
         return produtcId;
     }
-
-    public void destroyProduct(Long id){
+    @Transactional
+    public void destroyProduct(Long id, HttpServletRequest request){
+       if (getUserRole(request) != AccessUser.ADMIN){
+           throw new UnnauthorizedException("Requires authorization! Please contact the developer." +
+                   " Email: antoniojr.strong@gmail.com");
+       }
        iProductRepository.delete(iProductRepository.findByProductid(id).orElseThrow(() ->
                new EntityNotfoundException(String.format("this product id: {%s} not exists",id))));
     }

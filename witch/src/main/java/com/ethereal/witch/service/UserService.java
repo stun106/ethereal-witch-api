@@ -1,11 +1,13 @@
 package com.ethereal.witch.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.ethereal.witch.models.user.AccessUser;
 import com.ethereal.witch.models.user.User;
 import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.service.exception.EntityNotfoundException;
 import com.ethereal.witch.service.exception.PasswordInvalidException;
-import com.ethereal.witch.service.exception.UsernameUniqueViolationExeception;
+import com.ethereal.witch.service.exception.UniqueViolationExeception;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +17,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final IUserRepository iUserRepository;
+    private AccessUser getUserRole(HttpServletRequest request){
+        return iUserRepository.findByid((Long) request.getAttribute("idUser")).getAccess();
+    }
     @Transactional
     public User saveUser (User user){
         User newUser = findUsername(user.getUsername());
         if (newUser != null){
-            throw new UsernameUniqueViolationExeception(String.format("User {%s} already created.",user.getUsername()));
+            throw new UniqueViolationExeception(String.format("User {%s} already created.",user.getUsername()));
         }else{
             return iUserRepository.save(user);
         }
@@ -59,7 +64,6 @@ public class UserService {
 
         String cryptPassword = BCrypt.withDefaults().hashToString(12,newPassword.toCharArray());
         user.setPassword(cryptPassword);
-        System.out.println("----> " + user.getPassword());
         iUserRepository.save(user);
         return user;
     }
