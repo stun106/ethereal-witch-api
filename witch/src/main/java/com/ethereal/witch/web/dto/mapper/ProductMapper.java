@@ -6,8 +6,8 @@ import com.ethereal.witch.web.dto.ProductResponseDto;
 import org.modelmapper.ModelMapper;
 
 public class ProductMapper {
-    public static Product toProduct(ProductCreateDto productRecordDto){
-        return new ModelMapper().map(productRecordDto, Product.class);
+    public static Product toProduct(ProductCreateDto productCreateDto){
+        return new ModelMapper().map(productCreateDto, Product.class);
     }
     public static ProductResponseDto toProductDto(Product product){
         return new ModelMapper().map(product, ProductResponseDto.class);

@@ -1,19 +1,19 @@
 package com.ethereal.witch.web.dto;
 
+import com.ethereal.witch.models.product.Product;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class
-ProductResponseDto {
-    String nomeproduct;
-    BigDecimal valor;
-    String image;
+public class CategoryCreateDto {
+    @NotBlank
+    private String nomecategory;
 }

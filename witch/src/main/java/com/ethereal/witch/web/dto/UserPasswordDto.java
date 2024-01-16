@@ -1,4 +1,4 @@
-package com.ethereal.witch.web.dto.userDto;
+package com.ethereal.witch.web.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

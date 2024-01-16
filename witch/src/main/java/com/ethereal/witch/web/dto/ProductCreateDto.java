@@ -1,4 +1,4 @@
-package com.ethereal.witch.web.dto.productDto;
+package com.ethereal.witch.web.dto;
 
 import com.ethereal.witch.models.collection.Category;
 import com.ethereal.witch.models.product_type.TypeProduct;
