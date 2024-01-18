@@ -28,12 +28,6 @@ public class CartController {
     private final CartService cartService;
     private final UserService userService;
     private final ProductService productService;
-    @Autowired
-    private ICartShoppingRepository cartShoppingRepository;
-    @Autowired
-    private IProductRepository productRepository;
-    @Autowired
-    private IUserRepository userRepository;
     @PostMapping("/create/auth")
     public ResponseEntity create(@RequestBody CartShopping cart, HttpServletRequest request) {
         Product product = productService.findById(cart.getCartproduct().getProductid());

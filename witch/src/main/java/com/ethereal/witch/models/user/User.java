@@ -21,6 +21,7 @@ public class User {
     private String name;
     @Getter
     @Setter
+    @Column(name = "username", nullable = false,unique = true)
     private String username;
     @Getter
     @Setter

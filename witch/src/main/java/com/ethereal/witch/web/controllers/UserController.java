@@ -24,8 +24,6 @@ import java.util.Map;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private IUserRepository iuserRepository;
     private final UserService userService;
     @PostMapping("/create")
     public ResponseEntity<Object> create(@RequestBody @Valid UserCreateDto userDto) {

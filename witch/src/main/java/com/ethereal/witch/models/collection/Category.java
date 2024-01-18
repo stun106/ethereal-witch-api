@@ -9,9 +9,11 @@ import lombok.Setter;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
 @Data
 @Entity
-public class Category{
+public class Category {
     @Id
     @Getter
     @Setter
@@ -29,5 +31,4 @@ public class Category{
     public Category(String nomecategory){
         this.nomecategory = nomecategory;
     }
-
 }

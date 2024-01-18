@@ -47,7 +47,7 @@ public class AuthUser extends OncePerRequestFilter {
             String password = credential[1];
             var user = userService.findUsername(username);
             if (user == null){
-                response.sendError(401);
+               response.sendError(401);
             }else{
 
                 if (decodePassword(password.toCharArray(),user.getPassword())){
