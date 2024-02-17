@@ -1,9 +1,6 @@
 package com.ethereal.witch.web.exception;
 
-import com.ethereal.witch.service.exception.EntityNotfoundException;
-import com.ethereal.witch.service.exception.PasswordInvalidException;
-import com.ethereal.witch.service.exception.UniqueViolationExeception;
-import com.ethereal.witch.service.exception.UnnauthorizedException;
+import com.ethereal.witch.service.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,6 +43,13 @@ public class ApiExeptionHandler {
         return  ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorMessage(request, HttpStatus.UNAUTHORIZED,ex.getMessage()));
+    }
+    @ExceptionHandler(NullPointerAuthorizationException.class)
+    public ResponseEntity<ErrorMessage> nullPointerAuthorizationException(NullPointerAuthorizationException ex, HttpServletRequest request){
+        log.error("api error", ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(request,HttpStatus.BAD_REQUEST,ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

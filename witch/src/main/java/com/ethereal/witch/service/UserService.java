@@ -7,6 +7,7 @@ import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.service.exception.EntityNotfoundException;
 import com.ethereal.witch.service.exception.PasswordInvalidException;
 import com.ethereal.witch.service.exception.UniqueViolationExeception;
+import com.ethereal.witch.service.exception.UnnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,8 +45,13 @@ public class UserService {
 
     }
     @Transactional(readOnly = true)
-    public List<User> findAllUser(){
+    public List<User> findAllUser(HttpServletRequest request){
+        if (getUserRole(request) != AccessUser.ADMIN) {
+            throw new UnnauthorizedException("Requires authorization! Please contact the developer." +
+                    " Email: antoniojr.strong@gmail.com");
+        }else{
         return iUserRepository.findAll();
+        }
     }
     @Transactional(readOnly = true)
     public List<User> findiLike(String name){

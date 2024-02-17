@@ -29,7 +29,7 @@ public class User {
     @Getter
     @Setter
     @Enumerated(EnumType.STRING)
-    private AccessUser access;
+    private AccessUser access = AccessUser.USER;
     @OneToMany(mappedBy = "cartuser")
     private List<CartShopping> carts;
 
