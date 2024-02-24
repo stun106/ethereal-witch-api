@@ -10,31 +10,23 @@ import lombok.Setter;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Endereco {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "increment")
-    @Getter
-    @Setter
     private Long idendereco;
-    @Getter
-    @Setter
     @Column(nullable = false)
     private String cep;
     @Column(nullable = false)
-    @Getter
-    @Setter
+    private String cidade;
+    @Column(nullable = false)
+    private String estado;
     private String logradouro;
     @Column(nullable = false)
-    @Getter
-    @Setter
     private String bairro;
-    @Getter
-    @Setter
     private String numero;
-    @Getter
-    @Setter
     private String complemento;
-    @ManyToOne
-    @JoinColumn(name = "userid", referencedColumnName = "id")
-    private UserClient listuser;
+    @OneToOne(mappedBy = "endereco")
+    private UserClient enderecouser;
 }

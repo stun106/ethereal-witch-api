@@ -29,14 +29,13 @@ public class UserClient {
     private String password;
     @Getter
     @Setter
-    @OneToMany(mappedBy = "listuser")
-    private List<Endereco> enderecos;
+    @Enumerated(EnumType.STRING)
+    private AccessUser access = AccessUser.ADMIN;
     @Getter
     @Setter
-    @Enumerated(EnumType.STRING)
-    private AccessUser access = AccessUser.USER;
-    @OneToMany(mappedBy = "cartuser")
-    private List<CartShopping> carts;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "endereco_id", referencedColumnName = "idendereco")
+    private Endereco endereco;
 
     public UserClient() {
     }

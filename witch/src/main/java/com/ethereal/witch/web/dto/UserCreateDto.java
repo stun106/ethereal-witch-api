@@ -42,4 +42,25 @@ public class UserCreateDto {
     @Schema(description = "UserCreateDto", example = "@Ethereal123", type = "string",pattern = "")
     @Pattern(regexp = "^(?=.*[@#$%])(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9@#$%]{8,}$", message = "Your password must have 8 digits, a special character, an uppercase letter and a number to be valid.")
     private String password;
+    @NotBlank
+    @Schema(description = "UserCreateDto", example = "43815110", type = "string",pattern = "")
+    private String cep;
+    @NotBlank
+    @Schema(description = "UserCreateDto", example = "Salvador", type = "string",pattern = "")
+    private String cidade;
+    @NotBlank
+    @Schema(description = "UserCreateDto", example = "Bahia", type = "string",pattern = "")
+    private String estado;
+    @NotBlank
+    @Schema(description = "UserCreateDto", example = "Rua Castro Alves", type = "string",pattern = "")
+    private String logradouro;
+    @NotBlank
+    @Schema(description = "UserCreateDto", example = "Nazaré", type = "string",pattern = "")
+    private String bairro;
+    @NotBlank
+    @Schema(description = "UserCreateDto", example = "111", type = "string",pattern = "")
+    private String numero;
+    @NotBlank
+    @Schema(description = "UserCreateDto", example = "Ao lado do Nacional Gás", type = "string",pattern = "")
+    private String complemento;
 }
