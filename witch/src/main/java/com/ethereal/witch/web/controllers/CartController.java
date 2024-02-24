@@ -1,10 +1,7 @@
 package com.ethereal.witch.web.controllers;
 
 import com.ethereal.witch.models.product.Product;
-import com.ethereal.witch.models.user.User;
-import com.ethereal.witch.repository.ICartShoppingRepository;
-import com.ethereal.witch.repository.IProductRepository;
-import com.ethereal.witch.repository.IUserRepository;
+import com.ethereal.witch.models.user.UserClient;
 
 import com.ethereal.witch.models.shoppingcart.CartShopping;
 
@@ -12,7 +9,6 @@ import com.ethereal.witch.service.CartService;
 import com.ethereal.witch.service.ProductService;
 import com.ethereal.witch.service.UserService;
 import com.ethereal.witch.web.dto.ProductResponseDto;
-import com.ethereal.witch.web.dto.UserResponseDto;
 import com.ethereal.witch.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +42,7 @@ public class CartController {
     @PostMapping("/create/auth")
     public ResponseEntity create(@RequestBody CartShopping cart, HttpServletRequest request) {
         Product product = productService.findById(cart.getCartproduct().getProductid());
-        User user = userService.findById((Long) request.getAttribute("idUser"));
+        UserClient user = userService.findById((Long) request.getAttribute("idUser"));
         cart.setCartproduct(product);
         cart.setCartuser(user);
         CartShopping cartshp = cartService.saveCart(cart);

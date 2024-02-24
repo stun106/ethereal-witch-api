@@ -1,8 +1,8 @@
-CREATE TABLE User(
-id INT,
+CREATE TABLE User_Client(
+id INT PRIMARY KEY,
 name VARCHAR(100) NOT NULL,
 username VARCHAR(50) NOT NULL UNIQUE,
 password VARCHAR(255) NOT NULL,
 access VARCHAR(100) NOT NULL
 );
-CREATE INDEX idx_user_id ON User (id);
+CREATE INDEX idx_userclient_id ON User_Client (id);

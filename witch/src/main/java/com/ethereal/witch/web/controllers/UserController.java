@@ -1,6 +1,6 @@
 package com.ethereal.witch.web.controllers;
 
-import com.ethereal.witch.models.user.User;
+import com.ethereal.witch.models.user.UserClient;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.ethereal.witch.service.UserService;
 import com.ethereal.witch.service.exception.EntityNotfoundException;
@@ -46,7 +46,7 @@ public class UserController {
     public ResponseEntity<Object> create(@RequestBody @Valid UserCreateDto userDto) {
         var cryptPassword = BCrypt.withDefaults().hashToString(12, userDto.getPassword().toCharArray());
         userDto.setPassword(cryptPassword);
-        User user = userService.saveUser(UserMapper.toUser(userDto));
+        UserClient user = userService.saveUser(UserMapper.toUser(userDto));
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(user));
     }
 
@@ -65,7 +65,7 @@ public class UserController {
 
     @GetMapping("/all/auth")
     public ResponseEntity<Object> index(HttpServletRequest request) {
-        List<User> allUser = userService.findAllUser(request);
+        List<UserClient> allUser = userService.findAllUser(request);
         if (allUser.isEmpty()) {
             throw new EntityNotfoundException("Users not found.");
         }
@@ -80,7 +80,7 @@ public class UserController {
 
     @GetMapping("/single/{id}")
     public ResponseEntity<Object> findId(@PathVariable Long id) {
-        User userId = userService.findById(id);
+        UserClient userId = userService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(UserMapper.toDto(userId));
     }
     @Operation(summary = "Returns resource ilike.", description = "Resource for returns users ilike.",
@@ -133,7 +133,7 @@ public class UserController {
     @SecurityRequirement(name = "basicAuth")
     @DeleteMapping("/del/{id}/auth")
     public ResponseEntity<Map<String,String>> destroy(@PathVariable("id") Long id) {
-        User user = userService.findById(id);
+        UserClient user = userService.findById(id);
         userService.deleteUser(id);
         Map<String, String> flashmsg = new HashMap<>();
         flashmsg.put("msg", user.getName() + " has been successfully deleted.");
