@@ -2,7 +2,7 @@ package com.ethereal.witch.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.ethereal.witch.models.user.AccessUser;
-import com.ethereal.witch.models.user.User;
+import com.ethereal.witch.models.user.UserClient;
 import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.service.exception.EntityNotfoundException;
 import com.ethereal.witch.service.exception.PasswordInvalidException;
@@ -22,8 +22,8 @@ public class UserService {
         return iUserRepository.findByid((Long) request.getAttribute("idUser")).getAccess();
     }
     @Transactional
-    public User saveUser (User user){
-        User newUser = findUsername(user.getUsername());
+    public UserClient saveUser (UserClient user){
+        UserClient newUser = findUsername(user.getUsername());
         if (newUser != null){
             throw new UniqueViolationExeception(String.format("User {%s} already created.",user.getUsername()));
         }else{
@@ -31,7 +31,7 @@ public class UserService {
         }
     }
     @Transactional(readOnly = true)
-    public User findUsername (String name){
+    public UserClient findUsername (String name){
         try{
         return iUserRepository.findByUsername(name);
         }catch (EntityNotfoundException ex){
@@ -39,13 +39,13 @@ public class UserService {
         }
     }
     @Transactional(readOnly = true)
-    public User findById(Long id){
+    public UserClient findById(Long id){
             return iUserRepository.findById(id).orElseThrow(()->
                     new EntityNotfoundException(String.format("User id: %s not exists",id)));
 
     }
     @Transactional(readOnly = true)
-    public List<User> findAllUser(HttpServletRequest request){
+    public List<UserClient> findAllUser(HttpServletRequest request){
         if (getUserRole(request) != AccessUser.ADMIN) {
             throw new UnnauthorizedException("Requires authorization! Please contact the developer." +
                     " Email: antoniojr.strong@gmail.com");
@@ -54,15 +54,15 @@ public class UserService {
         }
     }
     @Transactional(readOnly = true)
-    public List<User> findiLike(String name){
-        return iUserRepository.findUserIlike(name);
+    public List<UserClient> findiLike(String name){
+        return iUserRepository.findUserlike(name);
     }
     @Transactional
-    public User ChangePassword(Long id, String currentPassword, String newPassword, String confirmPassword){
+    public UserClient ChangePassword(Long id, String currentPassword, String newPassword, String confirmPassword){
         if (!(newPassword.equals(confirmPassword))){
             throw new PasswordInvalidException("New password does not match password confirmation.");
         }
-        User user = iUserRepository.findByid(id);
+        UserClient user = iUserRepository.findByid(id);
         if (!(BCrypt.verifyer().verify(currentPassword.toCharArray(),user.getPassword()).verified)){
             System.out.println("user - " + user.getPassword() + " current - " + currentPassword );
             throw new PasswordInvalidException("Your password does not match.");

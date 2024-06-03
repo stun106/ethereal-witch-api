@@ -1,6 +1,7 @@
 package com.ethereal.witch.web.controllers;
 
-import com.ethereal.witch.models.user.User;
+import com.ethereal.witch.models.endereco.Endereco;
+import com.ethereal.witch.models.user.UserClient;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.ethereal.witch.service.UserService;
 import com.ethereal.witch.service.exception.EntityNotfoundException;
@@ -45,9 +46,19 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<Object> create(@RequestBody @Valid UserCreateDto userDto) {
         var cryptPassword = BCrypt.withDefaults().hashToString(12, userDto.getPassword().toCharArray());
-        userDto.setPassword(cryptPassword);
-        User user = userService.saveUser(UserMapper.toUser(userDto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(user));
+        Endereco endereco = new Endereco();
+        endereco.setCep(userDto.getCep());
+        endereco.setLogradouro(userDto.getLogradouro());
+        endereco.setBairro(userDto.getBairro());
+        endereco.setNumero(userDto.getNumero());
+        endereco.setCidade(userDto.getCidade());
+        endereco.setEstado(userDto.getEstado());
+        endereco.setComplemento(userDto.getComplemento());
+        UserClient userClient = UserMapper.toUser(userDto);
+        userClient.setEndereco(endereco);
+        userClient.setPassword(cryptPassword);
+        userClient = userService.saveUser(userClient);
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(userClient));
     }
 
     @Operation(summary = "Returns all users.", description = "Resource for returns all users.",
@@ -65,7 +76,7 @@ public class UserController {
 
     @GetMapping("/all/auth")
     public ResponseEntity<Object> index(HttpServletRequest request) {
-        List<User> allUser = userService.findAllUser(request);
+        List<UserClient> allUser = userService.findAllUser(request);
         if (allUser.isEmpty()) {
             throw new EntityNotfoundException("Users not found.");
         }
@@ -80,7 +91,7 @@ public class UserController {
 
     @GetMapping("/single/{id}")
     public ResponseEntity<Object> findId(@PathVariable Long id) {
-        User userId = userService.findById(id);
+        UserClient userId = userService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(UserMapper.toDto(userId));
     }
     @Operation(summary = "Returns resource ilike.", description = "Resource for returns users ilike.",
@@ -133,7 +144,7 @@ public class UserController {
     @SecurityRequirement(name = "basicAuth")
     @DeleteMapping("/del/{id}/auth")
     public ResponseEntity<Map<String,String>> destroy(@PathVariable("id") Long id) {
-        User user = userService.findById(id);
+        UserClient user = userService.findById(id);
         userService.deleteUser(id);
         Map<String, String> flashmsg = new HashMap<>();
         flashmsg.put("msg", user.getName() + " has been successfully deleted.");

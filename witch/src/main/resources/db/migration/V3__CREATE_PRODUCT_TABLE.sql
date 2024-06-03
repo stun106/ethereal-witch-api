@@ -1,5 +1,5 @@
 CREATE TABLE Product (
-productid INT,
+productid INT PRIMARY KEY,
 nomeproduct VARCHAR(100) NOT NULL,
 valor FLOAT,
 nometype INT,

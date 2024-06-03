@@ -1,7 +1,7 @@
 package com.ethereal.witch.models.shoppingcart;
 
 import com.ethereal.witch.models.product.Product;
-import com.ethereal.witch.models.user.User;
+import com.ethereal.witch.models.user.UserClient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Data
 @Entity
@@ -30,7 +29,7 @@ public class CartShopping {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "cartuserid")
-    private User cartuser;
+    private UserClient cartuser;
     @Getter
     @Setter
     @JsonIgnore

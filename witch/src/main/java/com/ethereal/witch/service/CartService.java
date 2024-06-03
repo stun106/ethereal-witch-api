@@ -1,7 +1,7 @@
 package com.ethereal.witch.service;
 
 import com.ethereal.witch.models.shoppingcart.CartShopping;
-import com.ethereal.witch.models.user.User;
+import com.ethereal.witch.models.user.UserClient;
 import com.ethereal.witch.repository.ICartShoppingRepository;
 import com.ethereal.witch.repository.IUserRepository;
 import com.ethereal.witch.service.exception.EntityNotfoundException;
@@ -26,7 +26,7 @@ public class CartService {
     }
     @Transactional(readOnly = true)
     public List<Object> findCartInfoByUser(HttpServletRequest request){
-        User user = iUserRepository.findByid((Long) request.getAttribute("idUser"));
+        UserClient user = iUserRepository.findByid((Long) request.getAttribute("idUser"));
         return  iCartShoppingRepository.findCartShoppingInfoByUsername(user.getId());
     }
     @Transactional

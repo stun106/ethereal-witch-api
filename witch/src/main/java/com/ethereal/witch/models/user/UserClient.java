@@ -1,6 +1,7 @@
 package com.ethereal.witch.models.user;
 
 
+import com.ethereal.witch.models.endereco.Endereco;
 import com.ethereal.witch.models.shoppingcart.CartShopping;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-public class User {
+public class UserClient {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "increment")
     @Getter
@@ -29,14 +30,17 @@ public class User {
     @Getter
     @Setter
     @Enumerated(EnumType.STRING)
-    private AccessUser access = AccessUser.USER;
-    @OneToMany(mappedBy = "cartuser")
-    private List<CartShopping> carts;
+    private AccessUser access = AccessUser.ADMIN;
+    @Getter
+    @Setter
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "endereco_id", referencedColumnName = "idendereco")
+    private Endereco endereco;
 
-    public User() {
+    public UserClient() {
     }
 
-    public User(String name, String username, String password) {
+    public UserClient(String name, String username, String password) {
         this.name = name;
         this.username = username;
         this.password = password;

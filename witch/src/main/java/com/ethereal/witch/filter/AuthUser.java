@@ -1,7 +1,7 @@
 package com.ethereal.witch.filter;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import com.ethereal.witch.models.user.User;
+import com.ethereal.witch.models.user.UserClient;
 import com.ethereal.witch.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -48,10 +48,10 @@ public class AuthUser extends OncePerRequestFilter {
             String auth = request.getHeader("Authorization");
 
             if (auth != null && auth.startsWith("Basic")) {
-               getAuthCredential(auth,request);
-                String username = getAuthCredential(auth, request)[0];
-                String password = getAuthCredential(auth, request)[1];
-                User user = userService.findUsername(username);
+                String[] credentials = getAuthCredential(auth, request);
+                String username = credentials[0];
+                String password = credentials[1];
+                UserClient user = userService.findUsername(username);
                 if (user == null) {
                     response.sendError(403,"Requires authorization! Please contact the developer. " +
                              "mail: antoniojr.strong@gmail.com");
