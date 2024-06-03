@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/witch.iml" filepath="$PROJECT_DIR$/.idea/witch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ethereal-witch-api.iml" filepath="$PROJECT_DIR$/.idea/ethereal-witch-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/witch/witch.iml" filepath="$PROJECT_DIR$/witch/witch.iml" />
     </modules>
   </component>
 </project>
